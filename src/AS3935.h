@@ -1,4 +1,4 @@
-/** 
+/**
  * AS3935 library
  * - for ESP8266/8255
  * - I2C Bus only
@@ -25,16 +25,21 @@
 
 class AS3935Sensor {
 public:
+  AS3935_CONFIGURATION configuration;
+  int32_t actualFrequency = 500000;
+
   AS3935Sensor();
   ~AS3935Sensor(void);
 
-  void begin(uint8_t, uint8_t, uint8_t, uint8_t);
+  void begin();
+
+  boolean detected(void);
+  AS3935_EVENT get(void);
 
   uint8_t readIntrruptReason(void);
 
-  boolean isIndoor(void);
-  boolean isOutdoor(void);
-  void setIndoor(bool);
+  uint8_t readAFEGainBoost();
+  void setAFEGainBoost(uint8_t);
 
   uint8_t readDistanceToStorm(void);
 
@@ -55,17 +60,24 @@ public:
   boolean readMaskDisturber();
   void setMaskDisturber(bool);
 
+  uint8_t readTuningCapacitors();
+  void setTuningCapacitors(uint8_t);
+
+  void displayLCOonIRQ(boolean);
+  void displayTRCOonIRQ(boolean);
+
   uint8_t readFrequencyDivisionForAntennaTuning();
   void setFrequencyDivisionForAntennaTuning(uint8_t);
 
   void setDefautSettings();
   void calibrateInternalRSOscillators();
+  uint8_t getTuningCapacitor();
   void clearStatistics();
 
 private:
   TwoWire I2CBus;
-  uint8_t sensorAddress;
-  uint8_t sensorIRQ;
+  boolean _detected = false;
+  AS3935_EVENT event;
   uint8_t readRegister(uint8_t registerNumber);
   uint8_t readRegister(uint8_t registerNumber, uint8_t mask, uint8_t readFrom);
   void writeRegister(uint8_t registerNumber, uint8_t mask, uint8_t writeFrom,
